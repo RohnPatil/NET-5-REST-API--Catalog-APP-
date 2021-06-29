@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Catalog.Entities;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Catalog.Repositories
 {
@@ -17,31 +18,35 @@ namespace Catalog.Repositories
 
         };
 
-        public IEnumerable<Item> GetItems()
+        public async Task<IEnumerable<Item>> GetItemsAsync()
         {
-            return items;
+            return await Task.FromResult(items);
         }
 
-        public Item GetItem(Guid Id)
+        public async Task<Item> GetItemAsync(Guid Id)
         {
-            return items.Where(item => item.Id == Id).SingleOrDefault();
+            var item = items.Where(item => item.Id == Id).SingleOrDefault();
+            return await Task.FromResult(item);
         }
 
-        public void CreateItem(Item item)
+        public async Task CreateItemAsync(Item item)
         {
             items.Add(item);
+            await Task.CompletedTask;
         }
 
-        public void UpdateItem(Item item)
+        public async Task UpdateItemAsync(Item item)
         {
             var index = items.FindIndex(existingItem => existingItem.Id== item.Id);
             items[index] = item;
+            await Task.CompletedTask;
         }
 
-        public void DeleteItem(Guid Id)
+        public async Task DeleteItemAsync(Guid Id)
         {
              var index = items.FindIndex(existingItem => existingItem.Id == Id);
             items.RemoveAt(index);
+            await Task.CompletedTask;
         }
     }
 }

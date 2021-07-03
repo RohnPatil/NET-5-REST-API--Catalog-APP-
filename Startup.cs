@@ -35,11 +35,11 @@ namespace Catalog
         {
             BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
             BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
-    
+            var mongoDbsettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
             services.AddSingleton<IMongoClient>(serviceProvider =>
             {
-                var settings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-                return new MongoClient(settings.ConnectionString);
+                
+                return new MongoClient(mongoDbsettings.ConnectionString);
             });
             services.AddSingleton<IItemsRepository, MongoDbItemsRepositories>();
             
@@ -52,7 +52,8 @@ namespace Catalog
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Catalog", Version = "v1" });
             });
 
-            services.AddHealthChecks();
+            services.AddHealthChecks()
+            .AddMongoDb(mongoDbsettings.ConnectionString,name:"mongodb", timeout:TimeSpan.FromSeconds(3));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
